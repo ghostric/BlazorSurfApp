@@ -1,0 +1,51 @@
+﻿@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime;
+@implements IAsyncDisposable;
+@page "/testmap"
+@using MapTestApp.Components.Models
+@using MapTestApp.Components.Handler
+
+<div id="map" style='width:1000px;height:800px;position:absolute'></div>
+
+@code
+{
+    private IJSObjectReference? mapModule;
+    private string? result;
+    public List<Swell> Swells = new List<Swell>();
+    protected override Task OnInitializedAsync()
+    {
+        getData(Swells);
+        return base.OnInitializedAsync();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mapModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/leaflet/testmap.js");
+            if(mapModule != null)
+            {
+                result = await mapModule.InvokeAsync<string>("Display", Swells);
+            }
+        }
+    }
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (mapModule is not null)
+        {
+            await mapModule.DisposeAsync();
+        }
+    }
+
+    public List<Swell> getData(List<Swell> swells)
+    {
+        Swell swell = new Swell()
+            {
+                latlng = [34.307174, -119.762373],
+                direction = 271,
+                esh = 6.4,
+                dateTime = DateTime.UtcNow
+            };
+        swells.Add(swell);
+        return swells;
+    }
+}
