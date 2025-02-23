@@ -1,10 +1,13 @@
 using MapTestApp.Components;
+using MapTestApp.Components.Handler;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<NoaaBouyCallHandler>(); // Register the handler as a scoped service
 
 var app = builder.Build();
 

@@ -2,8 +2,10 @@
 @inject IJSRuntime JSRuntime;
 @implements IAsyncDisposable;
 @page "/testmap"
-@using MapTestApp.Components.Models
 @using MapTestApp.Components.Handler
+@using MapTestApp.Components.Models
+@inject NoaaBouyCallHandler BouyCallHandler;
+
 
 <div id="map" style='width:1000px;height:800px;position:absolute'></div>
 
@@ -11,12 +13,26 @@
 {
     private IJSObjectReference? mapModule;
     private string? result;
-    public List<Swell> Swells = new List<Swell>();
-    protected override Task OnInitializedAsync()
+    public List<BouyMetaData> Swells = new List<BouyMetaData>();
+
+    public MapView()
     {
-        getData(Swells);
-        return base.OnInitializedAsync();
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Swells = await BouyCallHandler.FetchDataForAllStations();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
+
+        await base.OnInitializedAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -34,18 +50,5 @@
         {
             await mapModule.DisposeAsync();
         }
-    }
-
-    public List<Swell> getData(List<Swell> swells)
-    {
-        Swell swell = new Swell()
-            {
-                latlng = [34.307174, -119.762373],
-                direction = 271,
-                esh = 6.4,
-                dateTime = DateTime.UtcNow
-            };
-        swells.Add(swell);
-        return swells;
     }
 }
