@@ -12,38 +12,7 @@ namespace MapTestApp.Components.Handler
         public NoaaBouyCallHandler() { }
 
         // Function to get station links from the NDBC station page
-        //public static async Task<List<string>> GetStationLinksAsync(string url)
-        //{
-        //    var stationLinks = new List<string>();
-
-        //    // Fetch the HTML content of the page
-        //    var response = await httpClient.GetStringAsync(url);
-
-        //    // Parse the HTML content
-        //    var doc = new HtmlDocument();
-        //    doc.LoadHtml(response);
-
-        //    // Extract all links to individual station pages (assuming station links contain "station_page.php")
-        //    var links = doc.DocumentNode.SelectNodes("//a[contains(@href, 'station_page.php')]");
-
-        //    if (links != null)
-        //    {
-        //        foreach (var link in links)
-        //        {
-        //            string href = link.GetAttributeValue("href", string.Empty);
-        //            if (!string.IsNullOrEmpty(href))
-        //            {
-        //                // Complete the URL by appending the station URL
-        //                string stationUrl = "https://www.ndbc.noaa.gov/" + href;
-        //                stationLinks.Add(stationUrl);
-        //            }
-        //        }
-        //    }
-
-        //    return stationLinks;
-        //}
-
-        public static async Task<List<string>> GetStationLinksForCaliforniaAsync(string url)
+        public static async Task<List<string>> GetStationLinksAsync(string url)
         {
             var stationLinks = new List<string>();
 
@@ -54,33 +23,20 @@ namespace MapTestApp.Components.Handler
             var doc = new HtmlDocument();
             doc.LoadHtml(response);
 
-            // Find all <h2> elements containing "California" (since there can be multiple)
-            var californiaHeaders = doc.DocumentNode.Descendants("h2")
-                .Where(node => node.InnerText.Contains("California"))
-                .ToList();
+            // Extract all links to individual station pages (assuming station links contain "station_page.php")
+            var links = doc.DocumentNode.SelectNodes("//a[contains(@href, 'station_page.php')]");
 
-            foreach (var californiaHeader in californiaHeaders)
+            if (links != null)
             {
-                // For each "California" header, find the corresponding <div> with class "station-links"
-                var californiaDiv = californiaHeader
-                    .NextSibling // move to the next sibling, which could be the div
-                    .Descendants("div")
-                    .FirstOrDefault(div => div.GetAttributeValue("class", "").Contains("station-links"));
-
-                if (californiaDiv != null)
+                foreach (var link in links)
                 {
-                    // Now, extract all station links within this div
-                    var californiaStationLinks = californiaDiv
-                        .Descendants("a")
-                        .Where(a => a.GetAttributeValue("href", "").Contains("station_page.php"))
-                        .ToList();
-
-                    foreach (var link in californiaStationLinks)
+                    string href = link.GetAttributeValue("href", string.Empty);
+                    if (!string.IsNullOrEmpty(href))
                     {
-                        string href = link.GetAttributeValue("href", string.Empty);
-                        if (!string.IsNullOrEmpty(href))
+                        // Only add links for stations starting with "46"
+                        if (href.StartsWith("station_page.php?station=46"))
                         {
-                            // Complete the URL by appending the station URL base
+                            // Complete the URL by appending the station URL
                             string stationUrl = "https://www.ndbc.noaa.gov/" + href;
                             stationLinks.Add(stationUrl);
                         }
@@ -90,6 +46,54 @@ namespace MapTestApp.Components.Handler
 
             return stationLinks;
         }
+
+        //public static async Task<List<string>> GetStationLinksForCaliforniaAsync(string url)
+        //{
+        //    var stationLinks = new List<string>();
+
+        //    // Fetch the HTML content of the page
+        //    var response = await httpClient.GetStringAsync(url);
+
+        //    // Parse the HTML content
+        //    var doc = new HtmlDocument();
+        //    doc.LoadHtml(response);
+
+        //    // Find all <h2> elements containing "California" (since there can be multiple)
+        //    var californiaHeaders = doc.DocumentNode.Descendants("h2")
+        //        .Where(node => node.InnerText.Contains("California"))
+        //        .ToList();
+
+        //    foreach (var californiaHeader in californiaHeaders)
+        //    {
+        //        // For each "California" header, find the corresponding <div> with class "station-links"
+        //        var californiaDiv = californiaHeader
+        //            .NextSibling // move to the next sibling, which could be the div
+        //            .Descendants("div")
+        //            .FirstOrDefault(div => div.GetAttributeValue("class", "").Contains("station-links"));
+
+        //        if (californiaDiv != null)
+        //        {
+        //            // Now, extract all station links within this div
+        //            var californiaStationLinks = californiaDiv
+        //                .Descendants("a")
+        //                .Where(a => a.GetAttributeValue("href", "").Contains("station_page.php"))
+        //                .ToList();
+
+        //            foreach (var link in californiaStationLinks)
+        //            {
+        //                string href = link.GetAttributeValue("href", string.Empty);
+        //                if (!string.IsNullOrEmpty(href))
+        //                {
+        //                    // Complete the URL by appending the station URL base
+        //                    string stationUrl = "https://www.ndbc.noaa.gov/" + href;
+        //                    stationLinks.Add(stationUrl);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return stationLinks;
+        //}
 
         public static double[] ParseFirstTwoNumbers(string input)
         {
@@ -132,6 +136,12 @@ namespace MapTestApp.Components.Handler
 
                 var stationNameNode = doc.DocumentNode.SelectSingleNode("//h1");
                 string stationName = stationNameNode?.InnerText.Trim() ?? "Station name not found"; // extract station name from parsed string
+                bool isCA = stationName.Contains("CA");
+                if (!isCA) /* we only care about california bouys on this pass */
+                {
+                    return null;
+                }
+
                 var metaDataNode = doc.GetElementbyId("stn_metadata");
 
                 if (metaDataNode != null)
@@ -219,15 +229,15 @@ namespace MapTestApp.Components.Handler
                 string baseStationPageUrl = "https://www.ndbc.noaa.gov/to_station.shtml";
                 List<BouyMetaData> bouyMarkers = new List<BouyMetaData>();
                 // Step 1: Get all the station links
-                var stationLinks = await GetStationLinksForCaliforniaAsync(baseStationPageUrl);
+                var stationLinks = await GetStationLinksAsync(baseStationPageUrl);
 
                 // Step 2: For each station link, fetch and display its data
                 foreach (var stationLink in stationLinks)
                 {
                     var bouy = await GetStationDataAsync(stationLink);
-                   // if (bouy != null && bouy.bouyModel == "Waverider Buoy") { 
+                    if (bouy != null) {
                         bouyMarkers.Add(bouy);
-                   // }
+                    }
                 }
                 return bouyMarkers;
             }
