@@ -106,10 +106,6 @@ namespace MapTestApp.Components.Handler
                     if(reportsCheck.Contains("No Recent Reports")) return null;
                 } 
 
-                if (stationName.Contains("46252")){
-                    // break here to debug
-                    Console.WriteLine("46252");
-                }
                 var metaDataNode = doc.GetElementbyId("stn_metadata");
                 if (metaDataNode != null)
                 {
