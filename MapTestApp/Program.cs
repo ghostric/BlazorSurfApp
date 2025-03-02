@@ -1,5 +1,7 @@
 using MapTestApp.Components;
 using MapTestApp.Components.Handler;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<NoaaBouyCallHandler>(); // Register the handler as a scoped service
+// Register HttpClient
+builder.Services.AddHttpClient<NoaaBouyCallHandler>();
+
+// Register IDistributedCache (e.g., using in-memory cache for simplicity)
+builder.Services.AddDistributedMemoryCache();
+
+// Register the handler as a scoped service
+builder.Services.AddScoped<NoaaBouyCallHandler>();
 
 var app = builder.Build();
 

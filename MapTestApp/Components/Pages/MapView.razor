@@ -1,54 +1,17 @@
 ﻿@rendermode InteractiveServer
-@inject IJSRuntime JSRuntime;
 @implements IAsyncDisposable;
 @page "/testmap"
-@using MapTestApp.Components.Handler
-@using MapTestApp.Components.Models
-@inject NoaaBouyCallHandler BouyCallHandler;
 
-
-<div id="map" style='width:1000px;height:800px;position:absolute'></div>
-
-@code
+@if (IsLoading)
 {
-    private IJSObjectReference? mapModule;
-    private string? result;
-    public List<BouyMetaData> Swells = new List<BouyMetaData>();
-
-    public MapView()
-    {
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            Swells = await BouyCallHandler.FetchDataForAllStations();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching data: {ex.Message}");
-        }
-
-        await base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            mapModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/leaflet/testmap.js");
-            if(mapModule != null)
-            {
-                result = await mapModule.InvokeAsync<string>("Display", Swells);
-            }
-        }
-    }
-    async ValueTask IAsyncDisposable.DisposeAsync()
-    {
-        if (mapModule is not null)
-        {
-            await mapModule.DisposeAsync();
-        }
-    }
+    <p>Loading...</p>
 }
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <Alert Color="AlertColor.Primary"><Icon Name="IconName.ExclamationTriangleFill" class="me-2"></Icon>Error: @errorMessage</Alert>
+}
+else
+{
+    <div id="map" style='width:1000px;height:800px;position:absolute'></div>
+}
+
