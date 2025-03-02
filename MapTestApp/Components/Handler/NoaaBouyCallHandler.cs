@@ -99,6 +99,7 @@ namespace MapTestApp.Components.Handler
 
                 var stationNameNode = doc.DocumentNode.SelectSingleNode("//h1");
                 string stationName = stationNameNode?.InnerText.Trim() ?? "Station name not found";
+                
                 if (!stationName.Contains("CA")) return null;
                 var reportsCheck = doc.DocumentNode.SelectSingleNode("//h3")?.InnerText.Trim();
 
@@ -125,6 +126,11 @@ namespace MapTestApp.Components.Handler
                         {
                             bouyMetaData.latlng = ParseFirstTwoNumbers(columns[2].InnerText.Trim());
                         }
+                        if (bouyMetaData.latlng[0] == 0 && bouyMetaData.latlng[1] == 0)
+                        {
+                            bouyMetaData.latlng = ParseFirstTwoNumbers(columns[3].InnerText.Trim());
+                        }
+
                         bouyMetaData.stationID = stationName;
                         bouyMetaData.dateTime = DateTime.Now;
                     }
