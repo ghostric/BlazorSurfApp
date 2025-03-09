@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using MapTestApp.Components.Models;
 using Microsoft.Extensions.Caching.Distributed;
+
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace MapTestApp.Components.Handler
 
         private static double ParseDouble(string input)
         {
-            var cleanedInput = new string(input.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray());
+            var cleanedInput = new string(input.Where(c => char.IsDigit(c) || c == '.').ToArray());
             return double.TryParse(cleanedInput, out var result) ? result : 0;
         }
 
@@ -144,7 +145,7 @@ namespace MapTestApp.Components.Handler
                 if (currentObsTable != null)
                 {
                     var waveHeightNode = currentObsTable.SelectSingleNode(".//td[contains(text(), 'Wave Height (WVHT)')]//following-sibling::td");
-                    if (waveHeightNode != null) bouyConditions.WaveHeight = ParseDouble(waveHeightNode.InnerText);
+                    if (waveHeightNode != null) bouyConditions.waveHeight = ParseDouble(waveHeightNode.InnerText);
 
                     var dominantWavePeriodNode = currentObsTable.SelectSingleNode(".//td[contains(text(), 'Dominant Wave Period (DPD)')]//following-sibling::td");
                     if (dominantWavePeriodNode != null) bouyConditions.dominantWavePRD = ParseDouble(dominantWavePeriodNode.InnerText);
@@ -155,7 +156,7 @@ namespace MapTestApp.Components.Handler
                     var meanWaveDirectionNode = currentObsTable.SelectSingleNode(".//td[contains(text(), 'Mean Wave Direction (MWD)')]//following-sibling::td");
                     if (meanWaveDirectionNode != null) bouyConditions.meanWaveDR = meanWaveDirectionNode.InnerText.Trim();
 
-                    var waterTemperatureNode = currentObsTable.SelectSingleNode(".//td[contains(text(), 'Water Temperature (WTMP)')]//following-sibling::td");
+                    var waterTemperatureNode = currentObsTable.SelectSingleNode(".//td[contains(text(), ' Water Temperature (WTMP):')]//following-sibling::td");
                     if (waterTemperatureNode != null) bouyConditions.waterTemp = ParseDouble(waterTemperatureNode.InnerText);
                 }
 

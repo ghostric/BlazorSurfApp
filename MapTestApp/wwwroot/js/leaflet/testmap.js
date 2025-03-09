@@ -18,7 +18,7 @@
             marker.bindPopup(`
                 <b>Station ID:</b> ${swell.stationID}<br>
                 <b>DateTime:</b> ${new Date(swell.dateTime).toLocaleString()}<br>
-                <b>Wave Height:</b> ${swell.conditions.WaveHeight} ft<br>
+                <b>Wave Height:</b> ${swell.conditions.waveHeight ? swell.conditions.waveHeight : "N/A" } ft<br>
                 <b>Dominant Wave Period:</b> ${swell.conditions.dominantWavePRD} sec<br>
                 <b>Average Wave Period:</b> ${swell.conditions.avgWavePRD} sec<br>
                 <b>Mean Wave Direction:</b> ${swell.conditions.meanWaveDR}<br>
