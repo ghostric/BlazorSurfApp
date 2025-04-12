@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\Pages\WeatherReportForm.razor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Components\Pages\WeatherReportForm.razor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
   </ItemGroup>
 
