@@ -1,2 +1,16 @@
-﻿<h3>WeatherReportForm</h3>
+﻿@page "/WeatherReportForm";
 
+<h3>WeatherReportForm</h3>
+
+@if (IsLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <Alert Color="AlertColor.Primary"><Icon Name="IconName.ExclamationTriangleFill" class="me-2"></Icon>Error: @errorMessage</Alert>
+}
+else
+{
+    <form></form>
+}

@@ -7,5 +7,7 @@ namespace MapTestApp.Components.Pages
 {
     public partial class WeatherReportForm
     {
+        public bool IsLoading { get; set; } = false;
+        private string? errorMessage;
     }
 }

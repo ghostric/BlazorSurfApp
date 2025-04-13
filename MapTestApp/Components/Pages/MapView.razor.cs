@@ -2,6 +2,7 @@ using MapTestApp.Components.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MapTestApp.Components.Handler;
+using Serilog;
 
 namespace MapTestApp.Components.Pages
 {
@@ -30,7 +31,8 @@ namespace MapTestApp.Components.Pages
             }
             catch (Exception ex)
             {
-                errorMessage = $"Error fetching data: {ex.Message}";
+                errorMessage = ex.ToString();
+                Log.Error(ex.ToString());
             }
             finally
             {
@@ -58,7 +60,8 @@ namespace MapTestApp.Components.Pages
                 }
                 catch (Exception ex)
                 {
-                    errorMessage = $"Error initializing map: {ex.Message}";
+                    errorMessage = ex.ToString();
+                    Log.Error(ex.ToString());
                 }
             }
         }
@@ -73,7 +76,8 @@ namespace MapTestApp.Components.Pages
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error disposing map module: {ex.Message}");
+                    errorMessage = ex.ToString();
+                    Log.Error(ex.ToString());
                 }
             }
         }

@@ -2,8 +2,14 @@ using MapTestApp.Components;
 using MapTestApp.Components.Handler;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateLogger();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

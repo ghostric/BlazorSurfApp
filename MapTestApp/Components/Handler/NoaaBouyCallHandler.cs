@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using MapTestApp.Components.Models;
 using Microsoft.Extensions.Caching.Distributed;
-
+using Serilog;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace MapTestApp.Components.Handler
 
         public NoaaBouyCallHandler(HttpClient httpClient, IDistributedCache distributedCache)
         {
+            
             this.httpClient = httpClient;
             this.distributedCache = distributedCache;
         }
@@ -170,7 +171,7 @@ namespace MapTestApp.Components.Handler
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Log.Information(ex.ToString());
                 throw;
             }
         }
@@ -189,7 +190,7 @@ namespace MapTestApp.Components.Handler
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+               Log.Information(ex.ToString() );
                 throw;
             }
         }
